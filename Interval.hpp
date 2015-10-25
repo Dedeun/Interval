@@ -4,14 +4,14 @@
 #include <ostream>
 #include <vector>
 #include <algorithm>
-//namespace dd {
-
 ///  \file   Interval.hpp
 ///  \brief  This file is a short mathematical library which manage the interval.
 ///          The interval format is [min, max[ (with "min" and "max" integer)
 ///  \author Dedeun
 ///  \date   21 october 2015
 ///  \version Beta 1.4
+
+//namespace dd {
 
     ///  \class IntervalSingle
     ///  \brief This class is a single interval, with the 2 operations (intersection and reunion),
