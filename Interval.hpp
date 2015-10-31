@@ -125,13 +125,6 @@
         };
     protected:
     private:
-
-        /// \fn     isEmpty ()
-        /// \brief  test if the interval is empty
-        /// \param  reference to the single interval
-        /// \return Return true if the interval is empty
-        bool isEmpty (IntervalSingle const& inter) const;
-
         /// \var   m_interval
         /// \brief member variable: vector of single interval
         std::vector<IntervalSingle> m_inter;

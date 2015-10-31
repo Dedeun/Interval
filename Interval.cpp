@@ -21,6 +21,7 @@ bool IntervalSingle::intersection (IntervalSingle const& inter)
     // Case 2: Inter on right of *this
     // case 3: Inter on left of *this
     // Case 4: Inter and *this have no common point
+    // case 5: Inter is bigger than *this
     if (belong(inter.m_min)) {
         m_min = inter.m_min;
         if (belong(inter.m_max)) {
@@ -39,6 +40,7 @@ bool IntervalSingle::intersection (IntervalSingle const& inter)
         m_max = 0;
         return (false);
     } //end if
+    // it is case 5: no change
     return (true);
 }
 
@@ -107,21 +109,23 @@ IntervalMultiple::IntervalMultiple (int limMin, int limMax)
 void IntervalMultiple::intersection (IntervalSingle const& inter)
 {
     // For each element of the vectors, realize the intersection with the new interval.
-    //      --> What "algorithm" can be used ? (For_each does not modify the source container)
-    for (size_t i =0; i < m_inter.size(); i++) {
-        m_inter[i].intersection (inter);
-    } //end for
+    std::transform(m_inter.begin(), m_inter.end(), m_inter.begin(), [&inter](IntervalSingle interSingle){
+        interSingle.intersection (inter);
+        return (interSingle);
+    });
 
     // reduce the interval multiple (remove the empty interval)
-    std::vector<IntervalSingle>::iterator it;
-    auto f = std::bind(&IntervalMultiple::isEmpty, this, std::placeholders::_1);
-    it = std::remove_if (m_inter.begin(), m_inter.end(), f);
-    m_inter.resize( std::distance(m_inter.begin(),it) );
+//    std::vector<IntervalSingle>::iterator it;
+//    auto f = std::bind(&IntervalMultiple::isEmpty, this, std::placeholders::_1);
+//    it = std::remove_if (m_inter.begin(), m_inter.end(), f);
+    auto it = std::remove_if(m_inter.begin(), m_inter.end(), [](IntervalSingle interSingle){
+        return (interSingle.isEmpty ());
+    });
+    m_inter.resize(std::distance(m_inter.begin(),it) );
 
     // if the multiple interval is empty, add a null interval (refer definition of multiple interval)
     if (m_inter.size() == 0) {
-        IntervalSingle tmp{0,0};
-        reunion (tmp);
+        reunion (IntervalSingle {0,0});
     } // end if
 
 }
@@ -129,11 +133,11 @@ void IntervalMultiple::intersection (IntervalSingle const& inter)
 void IntervalMultiple::reunion (IntervalSingle const& inter)
 {
     // For each interval of the multiple interval, do the reunion with the interval
-    //      --> What "algorithm" can be used ? (For_each does not modify the source container, it is not possible to return a boolean)
     bool unionDone {false};
-    for (size_t i =0; i < m_inter.size(); i++) {
-        unionDone |= m_inter[i].reunion (inter);
-    } //end for
+    std::transform(m_inter.begin(), m_inter.end(), m_inter.begin(), [&inter, &unionDone](IntervalSingle interSingle){
+        unionDone |= interSingle.reunion (inter);
+        return (interSingle);
+    });
     // If one or more union have been done
     std::vector<IntervalSingle>::iterator it;
     if (unionDone) {
@@ -155,10 +159,4 @@ void IntervalMultiple::reunion (IntervalSingle const& inter)
         m_inter.push_back(inter);
         std::sort(m_inter.begin(), m_inter.end());
     }
-}
-
-// Function only used for the "remove-if" algorithm.
-bool IntervalMultiple::isEmpty (IntervalSingle const& inter) const
-{
-    return inter.isEmpty();
 }
