@@ -115,9 +115,6 @@ void IntervalMultiple::intersection (IntervalSingle const& inter)
     });
 
     // reduce the interval multiple (remove the empty interval)
-//    std::vector<IntervalSingle>::iterator it;
-//    auto f = std::bind(&IntervalMultiple::isEmpty, this, std::placeholders::_1);
-//    it = std::remove_if (m_inter.begin(), m_inter.end(), f);
     auto it = std::remove_if(m_inter.begin(), m_inter.end(), [](IntervalSingle interSingle){
         return (interSingle.isEmpty ());
     });
@@ -155,7 +152,7 @@ void IntervalMultiple::reunion (IntervalSingle const& inter)
         } while (unionDone);
     } else {
     // if no union have been done
-    // add the new interval to the multiple interval
+        // add the new interval to the multiple interval
         m_inter.push_back(inter);
         std::sort(m_inter.begin(), m_inter.end());
     }
